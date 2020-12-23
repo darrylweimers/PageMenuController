@@ -9,7 +9,7 @@ import UIKit
 import UtilityKit
 
 @available(iOS 13.0, *)
-class PageMenuController: UIViewController, MenuViewDataSource, MenuViewDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate {
+public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate {
     
     // MARK: store properties
     public var startAtPageIndex: Int
