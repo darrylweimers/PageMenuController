@@ -67,16 +67,16 @@ public class MenuController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     // MARK: collection view data source
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return datasource?.numberOfItems(in: collectionView) ?? 0
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         return datasource?.menuView(collectionView, itemAt: indexPath.row) ?? UICollectionViewCell()
     }
 
     // MARK: collection view delegate flow
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
         let superview: UIView = self.view
         let width = superview.bounds.width / CGFloat(datasource?.numberOfVisibleItem(in: collectionView) ?? 1)
@@ -89,7 +89,7 @@ public class MenuController: UIViewController, UICollectionViewDataSource, UICol
     }
     
     // MARK: - collection view delegate
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         delegate?.menuViewDidEndDecelerating(scrollView)
     }
     
