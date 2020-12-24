@@ -47,7 +47,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     }()
     
     // MARK: init
-    init?(menuTitles: [String], pageControllers: [UIViewController], startAtPageIndex: Int = 0) {
+    public init?(menuTitles: [String], pageControllers: [UIViewController], startAtPageIndex: Int = 0) {
         self.menuTitles = menuTitles
         self.pageControllers = pageControllers
         guard menuTitles.count == pageControllers.count,
@@ -61,12 +61,12 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         super.init(nibName: nil, bundle: nil)
     }
       
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: page view controller delegate and datasource
-    func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
+    public func pageViewController(_ pageViewController: UIPageViewController, willTransitionTo pendingViewControllers: [UIViewController]) {
 
         guard let nextPageController = pendingViewControllers.first else {
             return
@@ -74,7 +74,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         nextPageIndex = pageControllers.firstIndex(of: nextPageController)
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+    public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
         if (finished) {
             currentPageIndex = nextPageIndex
@@ -88,7 +88,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         }
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let index = pageControllers.firstIndex(of: viewController),
                 index - 1 >= 0 else {
             return nil // no page
@@ -97,7 +97,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         return pageControllers[index - 1] // previous page controller
     }
     
-    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+    public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         
         guard let index = pageControllers.firstIndex(of: viewController),
                 index + 1 < pageControllers.count else {
@@ -109,7 +109,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
 
 
     // MARK: menu view data and delegate
-    func menuViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func menuViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard let previousIndex = higlightedMenuItemIndex else {
             return
         }
@@ -131,11 +131,11 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     }
     
     // MARK: index conversion
-    func convertToMenuIndex(pageIndex index: Int) -> Int {
+    private func convertToMenuIndex(pageIndex index: Int) -> Int {
         return index + 1 // menu item is prepended to a spacer
     }
     
-    func convertToPageIndex(menuIndex index: Int) -> Int {
+    private func convertToPageIndex(menuIndex index: Int) -> Int {
         return index - 1 // menu item is prepended to a spacer
     }
     
@@ -156,15 +156,15 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     }
     
     // MARK: menu data source and delegate
-    func numberOfItems(in menuView: UICollectionView) -> Int {
+    public func numberOfItems(in menuView: UICollectionView) -> Int {
         return menuTitlesWithSpacer.count
     }
     
-    func numberOfVisibleItem(in menuView: UICollectionView) -> Int {
+    public func numberOfVisibleItem(in menuView: UICollectionView) -> Int {
         return numberOfVisibleMenuItem
     }
     
-    func menuView(_ menuView: UICollectionView, itemAt index: Int) -> LabelCell {
+    public func menuView(_ menuView: UICollectionView, itemAt index: Int) -> LabelCell {
         guard let cell = menuView.dequeueReusableCell(withReuseIdentifier: LabelCell.reuseIdentifier, for: IndexPath(row: index, section: 0)) as? LabelCell else {
             fatalError("Fail to dequeue cell")
         }
@@ -184,7 +184,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     
     
     // MARK: view setups
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         
@@ -196,7 +196,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         setupViews()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setHighlightedMenuCell(at: convertToMenuIndex(pageIndex: startAtPageIndex))
         

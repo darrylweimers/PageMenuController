@@ -22,7 +22,7 @@ public protocol MenuViewDelegate {
 @available(iOS 13.0, *)
 public class MenuController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
@@ -84,7 +84,7 @@ public class MenuController: UIViewController, UICollectionViewDataSource, UICol
         return CGSize(width: width, height: height)
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
     

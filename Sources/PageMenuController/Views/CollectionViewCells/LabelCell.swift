@@ -11,7 +11,7 @@ import UIKit
 @available(iOS 13.0, *)
 public class LabelCell: UICollectionViewCell {
     
-    static let reuseIdentifier = "\(LabelCell.self)"
+    public static let reuseIdentifier = "\(LabelCell.self)"
     
     private var _tintColor: UIColor = .secondaryLabel
     public override var tintColor: UIColor! {
@@ -36,7 +36,7 @@ public class LabelCell: UICollectionViewCell {
     }()
     
     // for creating views
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         
         let superview: UIView = self.contentView
@@ -55,11 +55,11 @@ public class LabelCell: UICollectionViewCell {
         reset()
     }
     
-    func reset() {
+    public func reset() {
         self.label.textAlignment = .center
     }
     
-    func layoutViews(superview: UIView) {
+    private func layoutViews(superview: UIView) {
         superview.addSubview(label)
         
         NSLayoutConstraint.activate([
