@@ -156,6 +156,26 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     }
     
     // MARK: menu data source and delegate
+    public func menuView(_ menuView: UICollectionView, didSelectItemAt index: Int) {
+        // index did change?
+        guard let previousIndex = higlightedMenuItemIndex else {
+            return
+        }
+        
+        let indexMoved = index - previousIndex // positive value: forward, negative value: backwards; zero: no change
+        guard indexMoved != 0 else {
+            return
+        }
+        
+        // scroll to page
+        self.pageViewController.setViewControllers([pageControllers[convertToPageIndex(menuIndex: index)]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
+        
+        // scroll to menu item
+        resetHighlightedMenuCell()
+        setHighlightedMenuCell(at: index)
+        menuController.selectMenuItem(at: index)
+    }
+    
     public func numberOfItems(in menuView: UICollectionView) -> Int {
         return menuTitlesWithSpacer.count
     }

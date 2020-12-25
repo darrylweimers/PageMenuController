@@ -17,6 +17,7 @@ public protocol MenuViewDataSource {
 @available(iOS 13.0, *)
 public protocol MenuViewDelegate {
     func menuViewDidEndDecelerating(_ scrollView: UIScrollView)
+    func menuView(_ menuView: UICollectionView, didSelectItemAt index: Int)
 }
 
 @available(iOS 13.0, *)
@@ -89,6 +90,10 @@ public class MenuController: UIViewController, UICollectionViewDataSource, UICol
     }
     
     // MARK: - collection view delegate
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        delegate?.menuView(collectionView, didSelectItemAt: indexPath.row)
+    }
+    
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         delegate?.menuViewDidEndDecelerating(scrollView)
     }
