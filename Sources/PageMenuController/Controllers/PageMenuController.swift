@@ -120,13 +120,14 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         }
     
         let indexMoved = index - previousIndex // positive value: forward, negative value: backwards; zero: no change
-        guard indexMoved != 0 else {
+        guard indexMoved != 0,
+              let pageIndex = convertToPageIndex(menuIndex: index) else {
             return
         }
         
         setHighlightedMenuCell(at: index)
         
-        self.pageViewController.setViewControllers([pageControllers[convertToPageIndex(menuIndex: index)]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
+        self.pageViewController.setViewControllers([pageControllers[pageIndex]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
         
     }
     
@@ -135,8 +136,13 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         return index + 1 // menu item is prepended to a spacer
     }
     
-    private func convertToPageIndex(menuIndex index: Int) -> Int {
-        return index - 1 // menu item is prepended to a spacer
+    private func convertToPageIndex(menuIndex index: Int) -> Int? {
+        let pageIndex = index - 1 // menu item is prepended and appended with a spacer item
+        guard pageIndex >= 0,
+              pageIndex < pageControllers.count else {
+            return nil
+        }
+        return pageIndex
     }
     
     // MARK:  highlight menu item controls
@@ -163,12 +169,13 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         }
         
         let indexMoved = index - previousIndex // positive value: forward, negative value: backwards; zero: no change
-        guard indexMoved != 0 else {
+        guard indexMoved != 0,
+              let pageIndex = convertToPageIndex(menuIndex: index) else {
             return
         }
         
         // scroll to page
-        self.pageViewController.setViewControllers([pageControllers[convertToPageIndex(menuIndex: index)]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
+        self.pageViewController.setViewControllers([pageControllers[pageIndex]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
         
         // scroll to menu item
         resetHighlightedMenuCell()
