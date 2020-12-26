@@ -76,7 +76,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
-        if (finished) {
+        if (completed) {
             currentPageIndex = nextPageIndex
             
             if let pageIndex = currentPageIndex {
