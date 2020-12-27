@@ -9,6 +9,11 @@ import UIKit
 import UtilityKit
 
 @available(iOS 13.0, *)
+public protocol PageMenuDelegate {
+    func pageMenu(didChangeToPageAtIndex index: Int)
+}
+
+@available(iOS 13.0, *)
 public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate {
     
     // MARK: store properties
@@ -20,6 +25,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     private var higlightedMenuItemIndex: Int?
     private var nextPageIndex: Int?
     private var currentPageIndex: Int?
+    public var delegate: PageMenuDelegate?
     
     // MARK: computed
     private var menuTitlesWithSpacer: [String] {
@@ -84,6 +90,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
                 resetHighlightedMenuCell()
                 setHighlightedMenuCell(at: menuIndex)
                 menuController.selectMenuItem(at: menuIndex)
+                delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
             }
         }
     }
@@ -128,6 +135,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         setHighlightedMenuCell(at: index)
         
         self.pageViewController.setViewControllers([pageControllers[pageIndex]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
+        delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
         
     }
     
@@ -181,6 +189,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         resetHighlightedMenuCell()
         setHighlightedMenuCell(at: index)
         menuController.selectMenuItem(at: index)
+        delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
     }
     
     public func numberOfItems(in menuView: UICollectionView) -> Int {
@@ -229,6 +238,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         
         let startingPageController = pageControllers[startAtPageIndex]
         pageViewController.setViewControllers([startingPageController], direction: .forward, animated: true, completion: nil)
+        delegate?.pageMenu(didChangeToPageAtIndex: startAtPageIndex)
     }
     
     private func setupViews() {
