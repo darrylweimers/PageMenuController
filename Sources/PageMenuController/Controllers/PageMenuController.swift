@@ -27,7 +27,6 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     private var nextPageIndex: Int?
     private var currentPageIndex: Int?
     
-    
     // MARK: computed
     private var menuTitlesWithSpacer: [String] {
         get {
@@ -35,7 +34,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         }
     }
     
-    private lazy var menuController: MenuController! = {
+    private lazy var menuController: MenuController = {
         let controller = MenuController()
         controller.datasource = self
         controller.delegate = self
@@ -44,7 +43,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         return controller
     }()
     
-    public lazy var pageViewController: UIPageViewController! = {
+    public lazy var pageViewController: UIPageViewController = {
         let controller = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         controller.delegate = self
         controller.dataSource = self
