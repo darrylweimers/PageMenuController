@@ -18,14 +18,15 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     
     // MARK: store properties
     public var startAtPageIndex: Int
+    public var delegate: PageMenuDelegate?
+    
     private var pageControllers : [UIViewController]
     private var menuTitles: [String]
     private let numberOfVisibleMenuItem = 3
-    private var centerMenuItemIndexPath: IndexPath?
     private var higlightedMenuItemIndex: Int?
     private var nextPageIndex: Int?
     private var currentPageIndex: Int?
-    public var delegate: PageMenuDelegate?
+    
     
     // MARK: computed
     private var menuTitlesWithSpacer: [String] {
@@ -63,6 +64,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
               startAtPageIndex >= 0 else {
             return nil
         }
+        self.currentPageIndex = startAtPageIndex
         self.startAtPageIndex = startAtPageIndex
         super.init(nibName: nil, bundle: nil)
     }
@@ -87,7 +89,6 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
             
             if let pageIndex = currentPageIndex {
                 let menuIndex = convertToMenuIndex(pageIndex: pageIndex)
-                resetHighlightedMenuCell()
                 setHighlightedMenuCell(at: menuIndex)
                 menuController.selectMenuItem(at: menuIndex)
                 delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
@@ -116,12 +117,32 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
 
 
     // MARK: menu view data and delegate
+    public func menuView(_ menuView: UICollectionView, didSelectItemAt index: Int) {
+        // index did change?
+        guard let previousIndex = higlightedMenuItemIndex else {
+            return
+        }
+        
+        let indexMoved = index - previousIndex // positive value: forward, negative value: backwards; zero: no change
+        guard indexMoved != 0,
+              let pageIndex = convertToPageIndex(menuIndex: index) else {
+            return
+        }
+        
+        // scroll to page
+        self.pageViewController.setViewControllers([pageControllers[pageIndex]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
+        
+        // scroll to menu item
+        setHighlightedMenuCell(at: index)
+        menuController.selectMenuItem(at: index)
+        delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
+    }
+    
     public func menuViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard let previousIndex = higlightedMenuItemIndex else {
             return
         }
         
-        resetHighlightedMenuCell()
         guard let index = menuController.getCenterItemIndex() else {
             return
         }
@@ -154,44 +175,12 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     }
     
     // MARK:  highlight menu item controls
-    private func resetHighlightedMenuCell() {
-        if  let index = higlightedMenuItemIndex,
-            let cell = menuController.collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? LabelCell {
-            cell.label.textColor = .secondaryLabel
-        }
-    }
-    
     private func setHighlightedMenuCell(at index: Int) {
         higlightedMenuItemIndex = index
-        let indexPath = IndexPath(row: index, section: 0)
-        if let cell = menuController.collectionView.cellForItem(at: indexPath) as? LabelCell {
-            cell.label.textColor = .black
-        }
+        menuController.collectionView.reloadData()
     }
     
     // MARK: menu data source and delegate
-    public func menuView(_ menuView: UICollectionView, didSelectItemAt index: Int) {
-        // index did change?
-        guard let previousIndex = higlightedMenuItemIndex else {
-            return
-        }
-        
-        let indexMoved = index - previousIndex // positive value: forward, negative value: backwards; zero: no change
-        guard indexMoved != 0,
-              let pageIndex = convertToPageIndex(menuIndex: index) else {
-            return
-        }
-        
-        // scroll to page
-        self.pageViewController.setViewControllers([pageControllers[pageIndex]], direction: indexMoved > 0 ? .forward : .reverse, animated: true, completion: nil)
-        
-        // scroll to menu item
-        resetHighlightedMenuCell()
-        setHighlightedMenuCell(at: index)
-        menuController.selectMenuItem(at: index)
-        delegate?.pageMenu(didChangeToPageAtIndex: pageIndex)
-    }
-    
     public func numberOfItems(in menuView: UICollectionView) -> Int {
         return menuTitlesWithSpacer.count
     }
@@ -207,14 +196,13 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         
         cell.label.font = UIFont.preferredFont(forTextStyle: .headline)
         cell.label.text = menuTitlesWithSpacer[index]
-        if let centerItemIndexPath = centerMenuItemIndexPath {
-            if centerItemIndexPath.row == index {
-                cell.label.textColor = .black
-            }
-        } else {
-            cell.label.textColor = .secondaryLabel
+        cell.label.textColor = .secondaryLabel
+        guard let menuIndex = higlightedMenuItemIndex,
+              menuIndex == index else {
+            return cell
         }
         
+        cell.label.textColor = .black
         return cell
     }
     
@@ -262,7 +250,24 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         ])
         
     }
-
+    
+    public func scrollToPage(atIndex desiredPageIndex: Int) {
+        guard desiredPageIndex < pageControllers.count,
+              desiredPageIndex >= 0,
+              let _currentPageIndex = currentPageIndex,
+              _currentPageIndex != desiredPageIndex else {
+            return
+        }
+       
+        
+        self.pageViewController.setViewControllers([pageControllers[desiredPageIndex]], direction: desiredPageIndex > _currentPageIndex ? .forward : .reverse, animated: true, completion: nil)
+        
+        let desiredMenuIndex = convertToMenuIndex(pageIndex: desiredPageIndex)
+        
+        // scroll to menu item
+        setHighlightedMenuCell(at: desiredMenuIndex)
+        menuController.selectMenuItem(at: desiredMenuIndex)
+    }
 
 }
 
