@@ -16,6 +16,19 @@ public protocol PageMenuDelegate {
 @available(iOS 13.0, *)
 public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewDelegate, UIPageViewControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate {
     
+    // MARK: cutomization
+    public var menuBackgroundColor: UIColor {
+        get {
+            return menuController.view.backgroundColor ?? .white
+        }
+        set (color) {
+            menuController.view.backgroundColor = color
+        }
+    }
+    
+    public var menuTextColor: UIColor = .secondaryLabel
+    public var menuSecondaryTextColor: UIColor = .black
+    
     // MARK: store properties
     public var startAtPageIndex: Int
     public var delegate: PageMenuDelegate?
@@ -27,10 +40,24 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     private var nextPageIndex: Int?
     private var currentPageIndex: Int?
     
+    
+    // layout
+    enum MenuTitleLayout {
+        case center
+        case left
+    }
+    
+    private var menuTitleLayout: MenuTitleLayout = .left
+    
     // MARK: computed
     private var menuTitlesWithSpacer: [String] {
         get {
-            return [""] + menuTitles + [""]
+            switch menuTitleLayout {
+            case .left:
+                return menuTitles
+            case .center:
+                return [""] + menuTitles + [""]
+            }
         }
     }
     
@@ -161,11 +188,25 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
     
     // MARK: index conversion
     private func convertToMenuIndex(pageIndex index: Int) -> Int {
-        return index + 1 // menu item is prepended to a spacer
+        switch menuTitleLayout {
+        case .left:
+            return index
+        case .center:
+            return index + 1 // menu item is prepended with a spacer
+        }
+        
+        return index
     }
     
     private func convertToPageIndex(menuIndex index: Int) -> Int? {
-        let pageIndex = index - 1 // menu item is prepended and appended with a spacer item
+        var pageIndex = index
+        switch menuTitleLayout {
+        case .left:
+            pageIndex = index
+        case .center:
+            pageIndex = index - 1 // menu item is prepended and appended with a spacer item
+        }
+    
         guard pageIndex >= 0,
               pageIndex < pageControllers.count else {
             return nil
@@ -195,13 +236,13 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         
         cell.label.font = UIFont.preferredFont(forTextStyle: .headline)
         cell.label.text = menuTitlesWithSpacer[index]
-        cell.label.textColor = .secondaryLabel
+        cell.label.textColor = menuSecondaryTextColor
         guard let menuIndex = higlightedMenuItemIndex,
               menuIndex == index else {
             return cell
         }
         
-        cell.label.textColor = .black
+        cell.label.textColor = menuTextColor
         return cell
     }
     
@@ -217,15 +258,17 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         }
         
         setupViews()
-    }
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        
+        // scroll to starting page
         setHighlightedMenuCell(at: convertToMenuIndex(pageIndex: startAtPageIndex))
         
         let startingPageController = pageControllers[startAtPageIndex]
         pageViewController.setViewControllers([startingPageController], direction: .forward, animated: true, completion: nil)
         delegate?.pageMenu(didChangeToPageAtIndex: startAtPageIndex)
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     private func setupViews() {
@@ -234,7 +277,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         
         NSLayoutConstraint.activate([
             menuController.view.topAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.topAnchor),
-            menuController.view.heightAnchor.constraint(equalToConstant: 60.0),
+            menuController.view.heightAnchor.constraint(equalToConstant: 40.0),
             menuController.view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
             menuController.view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
 
@@ -242,7 +285,7 @@ public class PageMenuController: UIViewController, MenuViewDataSource, MenuViewD
         
         NSLayoutConstraint.activate([
             pageViewController.view.topAnchor.constraint(equalTo: menuController.view.bottomAnchor),
-            pageViewController.view.bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor),
+            pageViewController.view.bottomAnchor.constraint(equalTo: superview.bottomAnchor),
             pageViewController.view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
             pageViewController.view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
 
